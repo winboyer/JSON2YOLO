@@ -55,29 +55,69 @@ folder_paths = [
 # train_val_images_folder = '/Users/jinyfeng/projects/ai-construction/wuliao_train_val_images'
 # train_val_labels_folder = '/Users/jinyfeng/projects/ai-construction/wuliao_train_val_labels'
 
-train_val_images_folder = 'D:/jinyfeng/datas/shajiangche/train_val_images'
-train_val_labels_folder = 'D:/jinyfeng/datas/shajiangche/train_val_labels'
+train_images_folder = 'D:/jinyfeng/datas/shajiangche/train_images'
+train_labels_folder = 'D:/jinyfeng/datas/shajiangche/train_labels'
 
-os.makedirs(train_val_images_folder, exist_ok=True)
-os.makedirs(train_val_labels_folder, exist_ok=True)
+val_images_folder = 'D:/jinyfeng/datas/shajiangche/val_images'
+val_labels_folder = 'D:/jinyfeng/datas/shajiangche/val_labels'
+
+if not os.path.exists(train_images_folder):
+    os.makedirs(train_images_folder)
+if not os.path.exists(train_labels_folder):
+    os.makedirs(train_labels_folder)
+if not os.path.exists(val_images_folder):
+    os.makedirs(val_images_folder)
+if not os.path.exists(val_labels_folder):
+    os.makedirs(val_labels_folder) 
+
 # 遍历每个文件夹路径
 for folder_path in folder_paths:
     print(f"Processing folder: {folder_path}")
     # 获取文件夹名称
     folder_name = os.path.basename(folder_path)
 
-    # 遍历文件夹中的所有 JSON 文件
-    for file_name in os.listdir(folder_path):
-        if file_name.endswith('.json'):
-            file_path = os.path.join(folder_path, file_name)
-            jpg_name = f"{file_name.replace('.json', '.jpg')}"
-            jpg_file_path = os.path.join(folder_path, jpg_name)
-            new_jpg_name = f"{folder_name}_{jpg_name}"
+    # 获取所有jpg文件名（不含扩展名）
+    all_files = [f for f in os.listdir(folder_path) if f.endswith('.json')]
+    random.shuffle(all_files)
+    split_idx = int(len(all_files) * 0.9)
+    train_files = all_files[:split_idx]
+    val_files = all_files[split_idx:]
+    print(f"Train files: {len(train_files)}, Val files: {len(val_files)}")
 
-            new_jpg_path = os.path.join(train_val_images_folder, new_jpg_name)
-            shutil.copy(jpg_file_path, new_jpg_path)
-            new_file_path = os.path.join(train_val_labels_folder, new_jpg_name.replace('.jpg', '.json'))
-            shutil.copy(file_path, new_file_path)
+    for file_name in train_files:
+        file_path = os.path.join(folder_path, file_name)
+        jpg_name = f"{file_name.replace('.json', '.jpg')}"
+        jpg_file_path = os.path.join(folder_path, jpg_name)
+        new_jpg_name = f"{folder_name}_{jpg_name}"
+
+        new_jpg_path = os.path.join(train_images_folder, new_jpg_name)
+        shutil.copy(jpg_file_path, new_jpg_path)
+        new_file_path = os.path.join(train_labels_folder, new_jpg_name.replace('.jpg', '.json'))
+        shutil.copy(file_path, new_file_path)
+
+    for file_name in val_files:
+        file_path = os.path.join(folder_path, file_name)
+        jpg_name = f"{file_name.replace('.json', '.jpg')}"
+        jpg_file_path = os.path.join(folder_path, jpg_name)
+        new_jpg_name = f"{folder_name}_{jpg_name}"
+
+        new_jpg_path = os.path.join(val_images_folder, new_jpg_name)
+        shutil.copy(jpg_file_path, new_jpg_path)
+        new_file_path = os.path.join(val_labels_folder, new_jpg_name.replace('.jpg', '.json'))
+        shutil.copy(file_path, new_file_path)
+
+    # # 遍历文件夹中的所有 JSON 文件
+    # for file_name in os.listdir(folder_path):
+    #     if file_name.endswith('.json'):
+    #         file_path = os.path.join(folder_path, file_name)
+    #         jpg_name = f"{file_name.replace('.json', '.jpg')}"
+    #         jpg_file_path = os.path.join(folder_path, jpg_name)
+    #         new_jpg_name = f"{folder_name}_{jpg_name}"
+
+    #         new_jpg_path = os.path.join(train_val_images_folder, new_jpg_name)
+    #         shutil.copy(jpg_file_path, new_jpg_path)
+    #         new_file_path = os.path.join(train_val_labels_folder, new_jpg_name.replace('.jpg', '.json'))
+    #         shutil.copy(file_path, new_file_path)
 
             # # 打开并读取 JSON 文件
             # with open(file_path, 'r', encoding='utf-8') as f:

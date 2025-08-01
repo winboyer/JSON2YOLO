@@ -1,6 +1,7 @@
 import os
 import requests
 from datetime import datetime
+from datetime import timedelta
 
 def convert_date_to_timestamp(date_str):
     """
@@ -46,12 +47,15 @@ def fetch_data_from_http_service(url, device_name, start_time, end_time):
         print(f"An error occurred: {e}")
         return None
 
-# Example usage
-if __name__ == "__main__":
-    url = "http://iot.krzhibo.com/admin/common/cloudData/getResourceAll"
-    
-    start_time = "2025-06-19T00:00:00Z"
-    end_time = "2025-06-20T00:00:00Z"
+def download_imgs(url, device_names, start_time, end_time):
+    """
+    Download images from the specified URL for a given device and time range.
+
+    :param url: The endpoint URL of the HTTP service.
+    :param device_name: The name of the device to query.
+    :param start_time: The start time for the query (e.g., '2023-01-01T00:00:00Z').
+    :param end_time: The end time for the query (e.g., '2023-01-02T00:00:00Z').
+    """
     start_timestamp = convert_date_to_timestamp(start_time)
     end_timestamp = convert_date_to_timestamp(end_time)
     if start_timestamp and end_timestamp:
@@ -61,7 +65,6 @@ if __name__ == "__main__":
     time_date = start_time[:10].replace("-", "")
     os.makedirs(time_date, exist_ok=True)
     # 10号电梯（KRIPCH_122203166_28），9号电梯（KRIPCH_108226008_43）
-    device_names = ["KRIPCH_108226008_43", "KRIPCH_122203166_28"]
     total_count = 0
     
     for device_name in device_names:
@@ -104,4 +107,26 @@ if __name__ == "__main__":
 
     print(f"Total count of images: {total_count}")
     print("All images have been downloaded.")
+
+# Example usage
+if __name__ == "__main__":
+    url = "http://iot.krzhibo.com/admin/common/cloudData/getResourceAll"
+    device_names = ["KRIPCH_108226008_43", "KRIPCH_122203166_28"]
+
+    start_time = "2025-07-31T00:00:00Z"
+    end_time = "2025-08-01T00:00:00Z"
+    # 判断 start_time 和 end_time 相差几天
+    dt_start = datetime.strptime(start_time, "%Y-%m-%dT%H:%M:%SZ")
+    dt_end = datetime.strptime(end_time, "%Y-%m-%dT%H:%M:%SZ")
+    delta_days = (dt_end - dt_start).days
+    print(f"Start time and end time are {delta_days} day(s) apart.")
+    if delta_days < 0:
+        print("Error: Start time must be earlier than end time.")
+        exit(1) 
+    elif delta_days >= 1:
+        for idx in range(delta_days):
+            current_start_time = (dt_start + timedelta(days=idx)).strftime("%Y-%m-%dT00:00:00Z")
+            current_end_time = (dt_start + timedelta(days=idx + 1)).strftime("%Y-%m-%dT00:00:00Z")
+            print(f"Downloading images for {current_start_time} to {current_end_time}")
+            download_imgs(url, device_names, current_start_time, current_end_time)
 
