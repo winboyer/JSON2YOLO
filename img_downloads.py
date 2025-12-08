@@ -2,6 +2,8 @@ import os
 import requests
 from datetime import datetime
 from datetime import timedelta
+from apscheduler.schedulers.blocking import BlockingScheduler
+import re
 
 def convert_date_to_timestamp(date_str):
     """
@@ -85,7 +87,7 @@ def download_imgs(url, device_names, start_time, end_time):
                         # print(item.keys())
                         image_url = item['pic']
                         print(image_url)
-                        txtfile.write(image_url + "\n")
+                        # txtfile.write(image_url + "\n")
                         try:
                             response = requests.get(image_url)
                             response.raise_for_status()  # 检查请求是否成功
@@ -99,7 +101,7 @@ def download_imgs(url, device_names, start_time, end_time):
                             print(f"Image {idx + 1} has been downloaded: {image_file_name}")
                         except requests.exceptions.RequestException as e:
                             print(f"Failed to download image {idx + 1} from {image_url}: {e}")
-                print(f"Image URLs have been written to {url_txtfile_name}")
+                # print(f"Image URLs have been written to {url_txtfile_name}")
             except IOError as e:
                 print(f"Failed to write data to file: {e}")
         else:
@@ -108,13 +110,52 @@ def download_imgs(url, device_names, start_time, end_time):
     print(f"Total count of images: {total_count}")
     print("All images have been downloaded.")
 
+
 # Example usage
 if __name__ == "__main__":
+    
+    scheduler = BlockingScheduler()
+
     url = "http://iot.krzhibo.com/admin/common/cloudData/getResourceAll"
     device_names = ["KRIPCH_108226008_43", "KRIPCH_122203166_28"]
+    # 获取当前目录下的文件夹
+    folders = [name for name in os.listdir('.') if os.path.isdir(name)]
+    # 过滤出符合 yyyymmdd 格式的文件夹
+    date_pattern = re.compile(r'^\d{8}$')
+    date_folders = [f for f in folders if date_pattern.match(f)]
+    # 获取离当前最近的日期
+    today = datetime.now()
+    closest_folder = None
+    min_diff = None
+    for folder in date_folders:
+        try:
+            folder_date = datetime.strptime(folder, "%Y%m%d")
+            diff = abs((folder_date - today).days)
+            if min_diff is None or diff < min_diff:
+                min_diff = diff
+                closest_folder = folder
+        except ValueError:
+            continue
+    print(f"Closest date folder: {closest_folder}")
+    # 获取 closest_folder+1 的日期并格式化
+    if closest_folder:
+        try:
+            folder_date_obj = datetime.strptime(closest_folder, "%Y%m%d")
+            next_day_obj = folder_date_obj + timedelta(days=1)
+            formatted_next_day = next_day_obj.strftime("%Y-%m-%dT00:00:00Z")
+            print(f"Formatted next day: {formatted_next_day}")
+        except Exception as e:
+            print(f"Error formatting next day: {e}")
+    else:
+        formatted_next_day = None
+    print(formatted_next_day)
 
-    start_time = "2025-07-31T00:00:00Z"
-    end_time = "2025-08-01T00:00:00Z"
+    current_date_str = datetime.now().strftime("%Y-%m-%dT00:00:00Z")
+    print(f"Current date in required format: {current_date_str}")
+
+
+    start_time = "2025-12-01T00:00:00Z"
+    end_time = "2025-12-08T00:00:00Z"
     # 判断 start_time 和 end_time 相差几天
     dt_start = datetime.strptime(start_time, "%Y-%m-%dT%H:%M:%SZ")
     dt_end = datetime.strptime(end_time, "%Y-%m-%dT%H:%M:%SZ")
@@ -130,3 +171,15 @@ if __name__ == "__main__":
             print(f"Downloading images for {current_start_time} to {current_end_time}")
             download_imgs(url, device_names, current_start_time, current_end_time)
 
+
+
+            # 每周一上午9点定时执行
+            # 可以使用 Windows 任务计划程序或 Linux 的 cron 来定时运行本脚本
+            # 例如，Linux 下可添加如下 cron 任务（假设 Python 路径和脚本路径已配置好）：
+            # 0 9 * * 1 /usr/bin/python3 /f:/jinyfeng/projects/JSON2YOLO/img_downloads.py
+
+            # 或者用 APScheduler 在代码内实现定时（需安装 apscheduler）
+            # from apscheduler.schedulers.blocking import BlockingScheduler
+            # scheduler = BlockingScheduler()
+            # scheduler.add_job(main, 'cron', day_of_week='mon', hour=9, minute=0)
+            # scheduler.start()
