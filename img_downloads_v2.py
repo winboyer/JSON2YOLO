@@ -80,13 +80,13 @@ def download_imgs():
             # 获取 closest_folder+1 的日期并格式化
             folder_date_obj = datetime.strptime(closest_folder, "%Y%m%d")
             next_day_obj = folder_date_obj + timedelta(days=1)
-            formatted_next_day = next_day_obj.strftime("%Y-%m-%dT00:00:00Z")
+            formatted_next_day = next_day_obj.strptime("%Y-%m-%dT%H:%M:%SZ")
             print(f"Formatted next day: {formatted_next_day}")
         except ValueError:
             continue
     print(f"Closest date folder: {closest_folder}")
     print(formatted_next_day)
-    current_date_str = datetime.now().strftime("%Y-%m-%dT00:00:00Z")
+    current_date_str = datetime.now().strptime("%Y-%m-%dT%H:%M:%SZ")
     print(f"Current date in required format: {current_date_str}")
 
     delta_days = (current_date_str - formatted_next_day).days

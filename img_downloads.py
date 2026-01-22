@@ -154,8 +154,8 @@ if __name__ == "__main__":
     print(f"Current date in required format: {current_date_str}")
 
 
-    start_time = "2025-12-01T00:00:00Z"
-    end_time = "2025-12-08T00:00:00Z"
+    start_time = "2025-12-15T00:00:00Z"
+    end_time = "2025-12-17T00:00:00Z"
     # 判断 start_time 和 end_time 相差几天
     dt_start = datetime.strptime(start_time, "%Y-%m-%dT%H:%M:%SZ")
     dt_end = datetime.strptime(end_time, "%Y-%m-%dT%H:%M:%SZ")
