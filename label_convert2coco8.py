@@ -51,6 +51,10 @@ folder_paths = [
     'F:/BaiduNetdiskDownload/182_20250603',
 ]
 
+folder_path = [
+    '/Users/jinyfeng/projects/ai-construction/20250619',
+]
+
 # 创建一个名为 "施工物料训练数据" 的文件夹
 # train_val_images_folder = '/Users/jinyfeng/projects/ai-construction/wuliao_train_val_images'
 # train_val_labels_folder = '/Users/jinyfeng/projects/ai-construction/wuliao_train_val_labels'
