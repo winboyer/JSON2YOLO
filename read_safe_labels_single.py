@@ -11,6 +11,7 @@ from PIL import Image
 import cv2
 import time
 import numpy as np
+import shutil
 
 def scale_person_bbox(x_min, y_min, x_max, y_max, img_width, img_height):
     """
@@ -206,10 +207,15 @@ def read_image_and_json(image_folder, json_folder, image_save_folder, label_save
                 
                 if person_cnt > 1:
                     print(f"  警告: person类别数量过多 ({person_cnt} 个)，跳过该文件")
+                    # prefix = os.path.dirname(image_folder)
+                    # base_name = os.path.basename(image_folder)
+                    # tmp_save_folder = os.path.join(prefix, base_name+"_multi_person")
+                    
                     time.sleep(60)
                     continue
 
                 bboxes = []                
+                image_crop = None
                 for i, shape in enumerate(data['shapes']):
                     label = shape.get('label', 'unknown')
                     label = label.lower()
@@ -286,11 +292,12 @@ def read_image_and_json(image_folder, json_folder, image_save_folder, label_save
 
 def main():
     parser = argparse.ArgumentParser(description='读取图像文件夹和JSON标注文件夹，提取标注坐标位置')
-    parser.add_argument('--image_folder', type=str, default='/home/jinyfeng/datas/suidao/16f3d2dbf72b7506c8252dcf147f6758_raw', help='图像文件夹路径')
-    parser.add_argument('--json_folder', type=str, default='/home/jinyfeng/datas/suidao/label_16f3d2dbf72b7506c8252dcf147f6758_raw', help='JSON标注文件夹路径')
-    parser.add_argument('--image_save_folder', type=str, default='/home/jinyfeng/datas/suidao/new_16f3d2dbf72b7506c8252dcf147f6758_raw_crop', help='处理后图像保存文件夹路径')
-    parser.add_argument('--label_save_folder', type=str, default='/home/jinyfeng/datas/suidao/new_label_16f3d2dbf72b7506c8252dcf147f6758_raw_crop', help='处理后JSON保存文件夹路径')
 
+    parser.add_argument('--image_folder', type=str, default='/home/jinyfeng/datas/suidao/safe_det/16f3d2dbf72b7506c8252dcf147f6758_raw', help='图像文件夹路径')
+    parser.add_argument('--json_folder', type=str, default='/home/jinyfeng/datas/suidao/safe_det/labels_16f3d2dbf72b7506c8252dcf147f6758_raw_v2', help='JSON标注文件夹路径')
+    parser.add_argument('--image_save_folder', type=str, default='/home/jinyfeng/datas/suidao/safe_det/new_16f3d2dbf72b7506c8252dcf147f6758_raw_v2_crop', help='处理后图像保存文件夹路径')
+    parser.add_argument('--label_save_folder', type=str, default='/home/jinyfeng/datas/suidao/safe_det/new_labels_16f3d2dbf72b7506c8252dcf147f6758_raw_v2_crop', help='处理后JSON保存文件夹路径')
+    
     args = parser.parse_args()
     
     print("开始读取图像和JSON标注数据...")

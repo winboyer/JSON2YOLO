@@ -232,15 +232,15 @@ def read_image_and_json(image_folder, json_folder, image_save_folder, label_save
                             })
                             category_set.add(label)
                         
-                        coco_annotations.append({
-                            "id": annotation_id + 1,
-                            "image_id": coco_image_id,
-                            "category_id": group_id,
-                            "bbox": [px0, py0, px1 - px0, py1 - py0],
-                            "area": (px1 - px0) * (py1 - py0),
-                            "segmentation": [],
-                            "iscrowd": 0
-                        })
+                        # coco_annotations.append({
+                        #     "id": annotation_id + 1,
+                        #     "image_id": coco_image_id,
+                        #     "category_id": group_id,
+                        #     "bbox": [px0, py0, px1 - px0, py1 - py0],
+                        #     "area": (px1 - px0) * (py1 - py0),
+                        #     "segmentation": [],
+                        #     "iscrowd": 0
+                        # })
                         annotation_id += 1
                     # person类别处理
                     elif label == 'person':
